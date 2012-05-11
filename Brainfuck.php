@@ -1,5 +1,11 @@
 <?php
-// HEADER
+/*
+ * Copyright 2012, Brainfuck Wiki Extension
+ *
+ * Author: Vladimir Kostyukov <vladimir.kostukov@gmail.com>
+ * License: http://www.apache.org/licenses/LICENSE-2.0.html
+ *
+ */
 
 if (!defined("MEDIAWIKI")) {
 	die("This file is a MediaWiki extension, it is not a valid entry point.");
@@ -14,7 +20,7 @@ $wgExtensionCredits["parserhook"][] = array(
 	"version" => "0.1",
 	"author" => "Vladimir Kostyukov",
 	"url" => "http://www.mediawiki.org/wiki/Extension:Brainfuck",
-	"description" => "Brainfuck Interpreter"
+	"description" => "Brainfuck Wiki Extension"
 );
 
 $wgHooks["ParserFirstCallInit"][] = "efBrainfuckSetup";
@@ -34,12 +40,15 @@ function efBrainfuckSetup(&$parser) {
 }
 
 function efBrainfuckMagic(&$magicWords, $langCode = "en") {
+
 	$magicWords["brainfuck"] = array( 0, "brainfuck");
 	$magicWords["bf"] = array( 0, "bf");
+
 	return true;
 }
 
 class Brainfuck {
+
 	public function evaluate($code) {
 		return $code;
 	}
@@ -51,6 +60,6 @@ class Brainfuck {
 	public function renderTag($input, $args, $parser) {
 		$code = $parser->recursiveTagParse($input);
 		return self::evaluate($code);
-	}
+ 	}
 }
 ?>
