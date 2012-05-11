@@ -10,45 +10,47 @@ if ( !method_exists("ParserOutput", "addHeadItem") ) {
 }
 
 $wgExtensionCredits["parserhook"][] = array(
-	'name' => "Brainfuck",
-	'version' => '0.1',
-	'author' => '[mailto:vladimir.kostyukov@intel.com Vladimir Kostyukov]',
-	'url' => 'http://vmsotcatom1.fm.intel.com/wiki/',
-	'description' => 'Intel/SOTC PERF Extension'
+	"name" => "Brainfuck",
+	"version" => "0.1",
+	"author" => "Vladimir Kostyukov",
+	"url" => "http://www.mediawiki.org/wiki/Extension:Brainfuck",
+	"description" => "Brainfuck Interpreter"
 );
 
-if (defined('MW_SUPPORTS_PARSERFIRSTCALLINIT')) {
-	$wgHooks['ParserFirstCallInit'][] = "efBrainfuckSetup";
-} else {
-	$wgExtensionFunctions[] = "efBrainfuckSetup";
-}
+$wgHooks["ParserFirstCallInit"][] = "efBrainfuckSetup";
+$wgHooks["LanguageGetMagic"][] = "efBrainfuckMagic";
 
-$wgHooks['LanguageGetMagic'][] = "efBrainfuckMagic";
+function efBrainfuckSetup(&$parser) {
 
-function efBrainfuckSetup() {
-	global $wgParser;
-	$hookStub = new BrainfuckHookStub();
-	$wgParser->setFunctionHook("brainfuck", array(&$hookStub, "efBrainfuck"));
-	$wgParser->setFunctionHook("bf", array(&$hookStub, "efBrainfuck"));
+	$brainfuck = new Brainfuck();
+
+	$parser->setFunctionHook("brainfuck", array(&$brainfuck, "renderParserFunction"));
+	$parser->setFunctionHook("bf", array(&$brainfuck, "renderParserFunction"));
+
+	$parser->setHook("brainfuck", array(&$brainfuck, "renderTag"));
+	$parser->setHook("bf", array(&$brainfuck, "renderTag"));
+
+	return true;
 }
 
 function efBrainfuckMagic(&$magicWords, $langCode = "en") {
-	$magicWords['brainfuck'] = array( 0, "brainfuck");
-	$magicWords['bf'] = array( 0, "bf");
+	$magicWords["brainfuck"] = array( 0, "brainfuck");
+	$magicWords["bf"] = array( 0, "bf");
 	return true;
 }
 
 class Brainfuck {
-	public function evaluate($source) {
-		return "";
+	public function evaluate($code) {
+		return $code;
+	}
+
+	public function renderParserFunction($parser, $code) {
+		return self::evaluate($code);
+	}
+
+	public function renderTag($input, $args, $parser) {
+		$code = $parser->recursiveTagParse($input);
+		return self::evaluate($code);
 	}
 }
-
-class BrainfuckHookStub {
-	function efBrainfuck(/*$parser, $code*/) {
-
-
-	}
-}
-
 ?>
