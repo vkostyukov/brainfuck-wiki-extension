@@ -1,0 +1,18 @@
+= SUMMARY =
+
+Brainfuck Embedded Interpreter - is a Media Wiki Extension which allows to interpret Brainfuck code on Wiki pages.
+
+= CHANGELOG =
+
+v 0.1 (May 2012)
+ * basic working version
+
+= TODO =
+
+* Make true-OOP version of BF Interpreter
+* Add parameters to interpreter
+
+= CONTACTS =
+
+Author: Vladimir Kostyukov <vladimir.kostukov@gmail.com> <http://vkostyukov.ru>
+Homepage: https://github.com/vkostyukov/brainfuck-wiki-extension

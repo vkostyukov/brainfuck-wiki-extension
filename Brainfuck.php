@@ -20,7 +20,7 @@ $wgExtensionCredits["parserhook"][] = array(
 	"version" => "0.1",
 	"author" => "Vladimir Kostyukov",
 	"url" => "http://www.mediawiki.org/wiki/Extension:Brainfuck",
-	"description" => "Brainfuck Wiki Extension"
+	"description" => "Brainfuck Embedded Interpreter"
 );
 
 $wgHooks["ParserFirstCallInit"][] = "efBrainfuckSetup";
