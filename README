@@ -11,6 +11,7 @@ v 0.1 (May 2012)
 
 * Make true-OOP version of BF Interpreter
 * Add parameters to interpreter
+* Add error handling
 
 = CONTACTS =
 

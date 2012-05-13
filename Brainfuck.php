@@ -96,12 +96,22 @@ class RightInstruction implements BrainfuckInstruction {
 class LoopInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
 		$context["NLC"]++;
+
+		$dataPointer = $context["dataPointer"];
+		$data = $context["data"];
+
+		$context["ZF"] = ord($data[$dataPointer]) == 0;
 	}
 }
 
 class PoolInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
 		$context["NLC"]--;
+
+		$dataPointer = $context["dataPointer"];
+		$data = $context["data"];
+
+		$context["ZF"] = ord($data[$dataPointer]) == 0;
 	}
 }
 
@@ -117,13 +127,20 @@ class OutInstruction implements BrainfuckInstruction {
 }
 
 class InInstruction implements  BrainfuckInstruction {
+
+	private $symbol;
+
+	function __construct($symbol) {
+		$this->symbol = $symbol;
+	}
+
 	public function perform($context) {
 		$dataPointer = &$context["dataPointer"];
 		$data = &$context["data"];
 		$GIF = &$context["GIF"];
 
 		if ($GIF) {
-
+			$data[$dataPointer] = $this->symbol;
 		}
 	}
 }
@@ -140,9 +157,13 @@ class BrainfuckParser {
 				case '<': $code[] = new LeftInstruction(); break;
 				case '>': $code[] = new RightInstruction(); break;
 				case '.': $code[] = new OutInstruction(); break;
-				case ',': $code[] = new InInstruction($source{++$index}); break;
+				case ',':
+					if ($index + 1 < strlen($source)) $code[] = new InInstruction($source{++$index});
+					else $code[] = chr(0);
+					break;
 				case '[': $code[] = new LoopInstruction(); break;
 				case ']': $code[] = new PoolInstruction(); break;
+				// TODO: add default err
 			}
 			$index++;
 		}
@@ -165,11 +186,11 @@ class RecursiveInterpreter implements BrainfuckInterpreter {
 		$context["codePointer"] = 0;
 		$context["dataPointer"] = 0;
 		$context["GIF"] = true; // Global Interpreter Flag
+		$context["ZF"] = true; // Zero Flag
 		$context["NLC"] = 0; // Nested Loops Counter
-		$context["returnPointers"] = array();
 		$context["output"] = "";
 
-		self::recursiveInterpret($code, $context);
+		$this->recursiveInterpret($code, $context);
 
 		return $context["output"];
 	}
@@ -182,19 +203,16 @@ class RecursiveInterpreter implements BrainfuckInterpreter {
 			$instruction->perform($context);
 			$nlcAfter = $context["NLC"];
 
-			// TODO: local interpreter flag
-
-			if ($nlcAfter > $nlcBefore) {
-				$return = $codePointer;
-				self::recursiveInterpret($code, $context);
-				
-			} else if ($nlcAfter < $nlcBefore) {
+			if ($nlcAfter > $nlcBefore && $context["GIF"] = !$context["ZF"]) {
+				$loopPointer = $codePointer - 1;
+				$this->recursiveInterpret($code, $context);
+				if (!$context["ZF"]) $codePointer = $loopPointer;
+			} elseif ($nlcAfter < $nlcBefore && $context["GIF"]) {
 				return;
 			}
 		}
 	}
 }
-
 
 class Brainfuck {
 
