@@ -46,6 +46,155 @@ function efBrainfuckMagic(&$magicWords, $langCode = "en") {
 
 	return true;
 }
+interface BrainfuckInstruction {
+	public function perform(&$context);
+}
+
+class PlusInstruction implements BrainfuckInstruction {
+	public function perform(&$context) {
+		$dataPointer = &$context["dataPointer"];
+		$data = &$context["data"];
+		$GIF = &$context["GIF"];
+
+		if ($GIF) $data[$dataPointer] = chr(ord($data[$dataPointer]) + 1);
+	}
+}
+
+class MinusInstruction implements BrainfuckInstruction {
+	public function perform(&$context) {
+		$dataPointer = &$context["dataPointer"];
+		$data = &$context["data"];
+		$GIF = &$context["GIF"];
+
+		if ($GIF) $data[$dataPointer] = chr(ord($data[$dataPointer]) + 1);
+	}
+}
+
+class LeftInstruction implements BrainfuckInstruction {
+	public function perform(&$context) {
+		$dataPointer = &$context["dataPointer"];
+		$data = &$context["data"];
+		$GIF = &$context["GIF"];
+
+		if ($GIF && $dataPointer > 0) $dataPointer--;
+	}
+}
+
+class RightInstruction implements BrainfuckInstruction {
+	public function perform(&$context) {
+		$dataPointer = &$context["dataPointer"];
+		$data = &$context["data"];
+		$GIF = &$context["GIF"];
+
+		if ($GIF) {
+			$dataPointer++;
+			if (!isset($data[$dataPointer])) $data[$dataPointer] = chr(0);
+		}
+	}
+}
+
+class LoopInstruction implements BrainfuckInstruction {
+	public function perform(&$context) {
+		$context["NLC"]++;
+	}
+}
+
+class PoolInstruction implements BrainfuckInstruction {
+	public function perform(&$context) {
+		$context["NLC"]--;
+	}
+}
+
+class OutInstruction implements BrainfuckInstruction {
+	public function perform(&$context) {
+		$dataPointer = &$context["dataPointer"];
+		$data = &$context["data"];
+		$output = &$context["output"];
+		$GIF = &$context["GIF"];
+
+		if ($GIF) $output .= $data[$dataPointer];
+	}
+}
+
+class InInstruction implements  BrainfuckInstruction {
+	public function perform($context) {
+		$dataPointer = &$context["dataPointer"];
+		$data = &$context["data"];
+		$GIF = &$context["GIF"];
+
+		if ($GIF) {
+
+		}
+	}
+}
+
+class BrainfuckParser {
+	public function parse($source) {
+		$index = 0;
+		$code = array();
+
+		while ($index < strlen($source)) {
+			switch($source{$index}) {
+				case '+': $code[] = new PlusInstruction(); break;
+				case '-': $code[] = new MinusInstruction(); break;
+				case '<': $code[] = new LeftInstruction(); break;
+				case '>': $code[] = new RightInstruction(); break;
+				case '.': $code[] = new OutInstruction(); break;
+				case ',': $code[] = new InInstruction($source{++$index}); break;
+				case '[': $code[] = new LoopInstruction(); break;
+				case ']': $code[] = new PoolInstruction(); break;
+			}
+			$index++;
+		}
+
+		return $code;
+	}
+}
+
+interface BrainfuckInterpreter {
+	public function interpret($source);
+}
+
+class RecursiveInterpreter implements BrainfuckInterpreter {
+	public function interpret($source) {
+		$parser = new BrainfuckParser();
+		$code = $parser->parse($source);
+
+		$context = array();
+		$context["data"] = array(chr(0));
+		$context["codePointer"] = 0;
+		$context["dataPointer"] = 0;
+		$context["GIF"] = true; // Global Interpreter Flag
+		$context["NLC"] = 0; // Nested Loops Counter
+		$context["returnPointers"] = array();
+		$context["output"] = "";
+
+		self::recursiveInterpret($code, $context);
+
+		return $context["output"];
+	}
+
+	private function recursiveInterpret($code, &$context) {
+		for ($codePointer = &$context["codePointer"]; $codePointer < count($code); $codePointer++) {
+			$instruction = $code[$codePointer];
+
+			$nlcBefore = $context["NLC"];
+			$instruction->perform($context);
+			$nlcAfter = $context["NLC"];
+
+			// TODO: local interpreter flag
+
+			if ($nlcAfter > $nlcBefore) {
+				$return = $codePointer;
+				self::recursiveInterpret($code, $context);
+				
+			} else if ($nlcAfter < $nlcBefore) {
+				return;
+			}
+		}
+	}
+}
+
 
 class Brainfuck {
 
@@ -103,7 +252,6 @@ class Brainfuck {
 
 		return $output;
 	}
-
 
 	public function renderParserFunction($parser, $code) {
 		return self::evaluate($code);
