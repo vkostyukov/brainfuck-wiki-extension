@@ -18,13 +18,13 @@ b) <brainfuck>>++++++++++[>+++++++>+++++++><<<-]>---->><<<>.>.</brainfuck>
 
 = INSTALLATION =
 
-1) Put file "Brainfuck.php" into new Wiki extensions directory:
+1) Put file "Brainfuck.php" into new Wiki extension directory:
 
    $IP/extensions/Brainfuck/Brainfuck.php
 
 2) Add following line to "LocalSettings.php":
 
-   require_once( "$IP/extensions/Brainfuck/Brainfuck.php" );
+   require_once("$IP/extensions/Brainfuck/Brainfuck.php");
 
 = CHANGELOG =
 
