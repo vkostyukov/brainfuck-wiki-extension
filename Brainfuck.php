@@ -53,77 +53,68 @@ interface BrainfuckInstruction {
 
 class PlusInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
-		$dataPointer = &$context["dataPointer"];
-		$data = &$context["data"];
-		$GIF = &$context["GIF"];
+		$GIF = $context["GIF"];
+		$pointer = $context["dataPointer"];
 
-		if ($GIF) $data[$dataPointer] = chr(ord($data[$dataPointer]) + 1);
+		if ($GIF) $context["data"][$pointer] = chr(ord($context["data"][$pointer]) + 1);
 	}
 }
 
 class MinusInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
-		$dataPointer = &$context["dataPointer"];
-		$data = &$context["data"];
-		$GIF = &$context["GIF"];
+		$GIF = $context["GIF"];
+		$pointer = $context["dataPointer"];
 
-		if ($GIF) $data[$dataPointer] = chr(ord($data[$dataPointer]) + 1);
+		if ($GIF) $context["data"][$pointer] = chr(ord($context["data"][$pointer]) - 1);
 	}
 }
 
 class LeftInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
-		$dataPointer = &$context["dataPointer"];
-		$data = &$context["data"];
-		$GIF = &$context["GIF"];
+		$GIF = $context["GIF"];
 
-		if ($GIF && $dataPointer > 0) $dataPointer--;
+		if ($GIF && $context["dataPointer"] > 0) $context["dataPointer"]--;
 	}
 }
 
 class RightInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
-		$dataPointer = &$context["dataPointer"];
-		$data = &$context["data"];
-		$GIF = &$context["GIF"];
+		$GIF = $context["GIF"];
 
 		if ($GIF) {
-			$dataPointer++;
-			if (!isset($data[$dataPointer])) $data[$dataPointer] = chr(0);
+			$context["dataPointer"]++;
+			if (!isset($context["data"][$context["dataPointer"]]))
+				$context["data"][$context["dataPointer"]] = chr(0);
 		}
 	}
 }
 
 class LoopInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
+		$GIF = $context["GIF"];
+		$pointer = $context["dataPointer"];
+
 		$context["NLC"]++;
-
-		$dataPointer = $context["dataPointer"];
-		$data = $context["data"];
-
-		$context["ZF"] = ord($data[$dataPointer]) == 0;
+		if ($GIF) $context["ZF"] = ord($context["data"][$pointer]) == 0;
 	}
 }
 
 class PoolInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
+		$GIF = $context["GIF"];
+		$pointer = $context["dataPointer"];
+
 		$context["NLC"]--;
-
-		$dataPointer = $context["dataPointer"];
-		$data = $context["data"];
-
-		$context["ZF"] = ord($data[$dataPointer]) == 0;
+		if ($GIF) $context["ZF"] = ord($context["data"][$pointer]) == 0;
 	}
 }
 
 class OutInstruction implements BrainfuckInstruction {
 	public function perform(&$context) {
-		$dataPointer = &$context["dataPointer"];
-		$data = &$context["data"];
-		$output = &$context["output"];
-		$GIF = &$context["GIF"];
+		$GIF = $context["GIF"];
+		$pointer = $context["dataPointer"];
 
-		if ($GIF) $output .= $data[$dataPointer];
+		if ($GIF) $context["output"] .= $context["data"][$pointer];
 	}
 }
 
@@ -135,14 +126,11 @@ class InInstruction implements  BrainfuckInstruction {
 		$this->symbol = $symbol;
 	}
 
-	public function perform($context) {
-		$dataPointer = &$context["dataPointer"];
-		$data = &$context["data"];
-		$GIF = &$context["GIF"];
+	public function perform(&$context) {
+		$GIF = $context["GIF"];
+		$pointer = $context["dataPointer"];
 
-		if ($GIF) {
-			$data[$dataPointer] = $this->symbol;
-		}
+		if ($GIF) $context["data"][$pointer] = $this->symbol;
 	}
 }
 
@@ -197,18 +185,25 @@ class RecursiveInterpreter implements BrainfuckInterpreter {
 	}
 
 	private function recursiveInterpret($code, &$context) {
-		for ($codePointer = &$context["codePointer"]; $codePointer < count($code); $codePointer++) {
-			$instruction = $code[$codePointer];
+		$lif = $context["GIF"]; // Local Interpreter Flag
+
+		for (;$context["codePointer"] < count($code); $context["codePointer"]++) {
+			$instruction = $code[$context["codePointer"]];
 
 			$nlcBefore = $context["NLC"];
 			$instruction->perform($context);
 			$nlcAfter = $context["NLC"];
 
-			if ($nlcAfter > $nlcBefore && $context["GIF"] = !$context["ZF"]) {
-				$loopPointer = $codePointer - 1;
-				$this->recursiveInterpret($code, $context);
-				if (!$context["ZF"]) $codePointer = $loopPointer;
-			} elseif ($nlcAfter < $nlcBefore && $context["GIF"]) {
+			if ($nlcAfter > $nlcBefore) {
+				if ($context["GIF"] = !$context["ZF"]) {
+					$loopPointer = $context["codePointer"]++ - 1;
+					$this->recursiveInterpret($code, $context);
+					if (!$context["ZF"]) $context["codePointer"] = $loopPointer;
+				} else {
+					$this->recursiveInterpret($code, $context);
+					$context["GIF"] = $lif;
+				}
+			} elseif ($nlcAfter < $nlcBefore) {
 				return;
 			}
 		}
