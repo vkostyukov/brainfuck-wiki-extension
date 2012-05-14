@@ -175,6 +175,8 @@ interface BrainfuckInterpreter {
 
 class RecursiveInterpreter implements BrainfuckInterpreter {
 
+	public static $MAX_NESTED_LOOPS = 3000;
+
 	private $parser;
 
 	public function __construct() {
@@ -214,6 +216,14 @@ class RecursiveInterpreter implements BrainfuckInterpreter {
 			$instruction->perform($context);
 			$nlcAfter = $context["NLC"];
 
+			if ($nlcAfter > self::$MAX_NESTED_LOOPS) {
+				throw new InterpretException("interpret exception: overflow nested loops counter: ".$nlcAfter." loops");
+			}
+
+			if ($nlcAfter < 0) {
+				throw new InterpretException("interpret exception: broken loop statement");
+			}
+
 			if ($nlcAfter > $nlcBefore) {
 				if ($context["GIF"] = !$context["ZF"]) {
 					$loopPointer = $context["codePointer"]++ - 1;
@@ -227,6 +237,10 @@ class RecursiveInterpreter implements BrainfuckInterpreter {
 			} elseif ($nlcAfter < $nlcBefore) {
 				return;
 			}
+		}
+
+		if ($context["NLC"] != 0) {
+			throw new InterpretException("interpret exception: broken loop statement");
 		}
 	}
 }
