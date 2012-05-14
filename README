@@ -4,6 +4,9 @@ Brainfuck Embedded Interpreter - is a Media Wiki Extension which allows to inter
 
 = CHANGELOG =
 
+v 0.3 (May 2012)
+* added error handling (runtime errors, parse errors)
+
 v 0.2 (May 2012)
 * rewrote whole code in OOP-style
 
@@ -12,9 +15,8 @@ v 0.1 (May 2012)
 
 = TODO =
 
-* Make true-OOP version of BF Interpreter
-* Add parameters to interpreter
-* Add error handling
+* Allow to interpret more than one source (v 0.5)
+* Add parameters to interpreter (v 0.4)
 
 = CONTACTS =
 

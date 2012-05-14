@@ -2,7 +2,7 @@
 /*
  * Copyright 2012, Brainfuck Wiki Extension
  *
- * Version: 0.2
+ * Version: 0.3
  * Author: Vladimir Kostyukov <vladimir.kostukov@gmail.com>
  * License: http://www.apache.org/licenses/LICENSE-2.0.html
  *
@@ -18,7 +18,7 @@ if ( !method_exists("ParserOutput", "addHeadItem") ) {
 
 $wgExtensionCredits["parserhook"][] = array(
 	"name" => "Brainfuck",
-	"version" => "0.1",
+	"version" => "0.3",
 	"author" => "Vladimir Kostyukov",
 	"url" => "http://www.mediawiki.org/wiki/Extension:Brainfuck",
 	"description" => "Brainfuck Embedded Interpreter"
