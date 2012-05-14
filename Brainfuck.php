@@ -47,6 +47,10 @@ function efBrainfuckMagic(&$magicWords, $langCode = "en") {
 
 	return true;
 }
+
+class ParseException extends Exception { }
+class InterpretException extends Exception { }
+
 interface BrainfuckInstruction {
 	public function perform(&$context);
 }
@@ -122,7 +126,7 @@ class InInstruction implements  BrainfuckInstruction {
 
 	private $symbol;
 
-	function __construct($symbol) {
+	public function __construct($symbol) {
 		$this->symbol = $symbol;
 	}
 
@@ -152,7 +156,11 @@ class BrainfuckParser {
 					break;
 				case '[': $code[] = new LoopInstruction(); break;
 				case ']': $code[] = new PoolInstruction(); break;
-				// TODO: add default err
+				case '\n':
+				case ' ':
+				case '\t':
+				case '\r': break;
+				default: throw new ParseException("parse error: unexpected symbol \"".$source{$index}."\"");
 			}
 			$index++;
 		}
@@ -166,22 +174,34 @@ interface BrainfuckInterpreter {
 }
 
 class RecursiveInterpreter implements BrainfuckInterpreter {
+
+	private $parser;
+
+	public function __construct() {
+		$this->parser = new BrainfuckParser();
+	}
+
 	public function interpret($source) {
-		$parser = new BrainfuckParser();
-		$code = $parser->parse($source);
+		try {
+			$code = $this->parser->parse($source);
 
-		$context = array();
-		$context["data"] = array(chr(0));
-		$context["codePointer"] = 0;
-		$context["dataPointer"] = 0;
-		$context["GIF"] = true; // Global Interpreter Flag
-		$context["ZF"] = true; // Zero Flag
-		$context["NLC"] = 0; // Nested Loops Counter
-		$context["output"] = "";
+			$context = array();
+			$context["data"] = array(chr(0));
+			$context["codePointer"] = 0;
+			$context["dataPointer"] = 0;
+			$context["GIF"] = true; // Global Interpreter Flag
+			$context["ZF"] = true; // Zero Flag
+			$context["NLC"] = 0; // Nested Loops Counter
+			$context["output"] = "";
 
-		$this->recursiveInterpret($code, $context);
+			$this->recursiveInterpret($code, $context);
 
-		return $context["output"];
+			return $context["output"];
+		} catch (ParseException $pe) {
+			return $pe->getMessage();
+		} catch (InterpretException $ie) {
+			return $ie->getMessage();
+		}
 	}
 
 	private function recursiveInterpret($code, &$context) {
@@ -200,6 +220,7 @@ class RecursiveInterpreter implements BrainfuckInterpreter {
 					$this->recursiveInterpret($code, $context);
 					if (!$context["ZF"]) $context["codePointer"] = $loopPointer;
 				} else {
+					$context["codePointer"]++;
 					$this->recursiveInterpret($code, $context);
 					$context["GIF"] = $lif;
 				}
