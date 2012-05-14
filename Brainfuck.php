@@ -152,7 +152,7 @@ class BrainfuckParser {
 				case '.': $code[] = new OutInstruction(); break;
 				case ',':
 					if ($index + 1 < strlen($source)) $code[] = new InInstruction($source{++$index});
-					else $code[] = chr(0);
+					else $code[] = new InInstruction(chr(0));
 					break;
 				case '[': $code[] = new LoopInstruction(); break;
 				case ']': $code[] = new PoolInstruction(); break;
