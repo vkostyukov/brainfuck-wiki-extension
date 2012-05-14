@@ -39,10 +39,13 @@ v 0.1 (May 2012)
 
 = TODO =
 
+* Add performance counters to interpreters (instructions executed, loops iterations performed, etc ..) (v 0.7)
+* Add alternative interpreter implementation (StackInterpreter for example) (v 0.6)
 * Allow to interpret more than one source (v 0.5)
 * Add parameters to interpreter (v 0.4)
 
 = CONTACTS =
 
-Author: Vladimir Kostyukov <vladimir.kostukov@gmail.com> <http://vkostyukov.ru>
-Homepage: https://github.com/vkostyukov/brainfuck-wiki-extension
+Author: Vladimir Kostyukov <vladimir.kostukov@gmail.com>
+GitHub page: https://github.com/vkostyukov/brainfuck-wiki-extension
+Extension page: http://www.mediawiki.org/wiki/Extension:Brainfuck
