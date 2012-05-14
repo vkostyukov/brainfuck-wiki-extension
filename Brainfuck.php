@@ -247,68 +247,18 @@ class RecursiveInterpreter implements BrainfuckInterpreter {
 
 class Brainfuck {
 
-	public function evaluate($code, &$context = array()) {
-		$output = ""; $deep = 0;
-		$defaults = array("data" => array(chr(0)), "cp" => 0, "dp" => 0);
-		$context = array_merge($defaults, $context);
-
-		while (true) {
-			switch ($code{$context["cp"]}) {
-			case '+':
-				$context["data"][$context["dp"]] = chr(ord($context["data"][$context["dp"]]) + 1);
-				break;
-			case '-':
-				$context["data"][$context["dp"]] = chr(ord($context["data"][$context["dp"]]) - 1);
-				break;
-			case '>':
-				$context["dp"]++;
-				if (!isset($context["data"][$context["dp"]])) $context["data"][$context["dp"]] = chr(0);
-				break;
-			case '<':
-				if ($context["dp"] == 0) break;
-				$context["dp"]--;
-				break;
-			case '.':
-				$output .= $context["data"][$context["dp"]];
-				break;
-			case ',':
-				$context["data"][$context["dp"]] = $context["cp"] == strlen($code) ? chr(0) : $code[$context["cp"]++];
-				break;
-			case '[':
-				if (ord($context["data"][$context["dp"]]) == 0 && $context["dp"] != 0) {
-					$deep++;
-					while ($deep && $context["cp"]++ < strlen($code)) {
-						if ($code[$context["cp"]] == '[') {
-							$deep++;
-						} elseif ($code[$context["cp"]] == ']') {
-							$deep--;
-						}
-					}
-				} else {
-					$loop = $context["cp"]++ - 1;
-					$output .= self::evaluate($code, $context);
-					if (ord($context["data"][$context["dp"]]) != 0) {
-						$context["cp"] = $loop;
-					}
-				}
-				break;
-			case ']':
-				return $output;
-			}
-
-			if (++$context["cp"] == strlen($code)) break;
-		}
-
-		return $output;
+	public function evaluate($source) {
+		$interpreter = new RecursiveInterpreter();
+		return $interpreter->interpret($source);
 	}
 
-	public function renderParserFunction($parser, $code) {
-		return self::evaluate($code);
+	public function renderParserFunction($parser, $source) {
+		return $this->evaluate($source);
 	}
 
 	public function renderTag($input, $args, $parser) {
-		$code = $parser->recursiveTagParse($input);
-		return self::evaluate($code);
+		$source = $parser->recursiveTagParse($input);
+		return $this->evaluate($source);
  	}
 }
 ?>
