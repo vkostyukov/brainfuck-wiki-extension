@@ -2,6 +2,30 @@
 
 Brainfuck Embedded Interpreter - is a Media Wiki Extension which allows to interpret Brainfuck code on Wiki pages.
 
+= USAGE =
+
+There are two ways to use this extension: a) through parser function b) through tag.
+
+The following examples are renders as "BF" string (like "BrainFuck"):
+
+a) {{#brainfuck:>++++++++++[>+++++++>+++++++><<<-]>---->><<<>.>.}}
+   or
+   {{#bf:>++++++++++[>+++++++>+++++++><<<-]>---->><<<>.>.}}
+
+b) <brainfuck>>++++++++++[>+++++++>+++++++><<<-]>---->><<<>.>.</brainfuck>
+   or
+   <bf>>++++++++++[>+++++++>+++++++><<<-]>---->><<<>.>.</bf>
+
+= INSTALLATION =
+
+1) Put file "Brainfuck.php" into new Wiki extensions directory:
+
+   $IP/extensions/Brainfuck/Brainfuck.php
+
+2) Add following line to "LocalSettings.php":
+
+   require_once( "$IP/extensions/Brainfuck/Brainfuck.php" );
+
 = CHANGELOG =
 
 v 0.3 (May 2012)
