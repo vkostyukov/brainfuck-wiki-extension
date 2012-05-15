@@ -127,7 +127,7 @@ class OutInstruction implements BrainfuckInstruction {
 	}
 }
 
-class InInstruction implements  BrainfuckInstruction {
+class InInstruction implements BrainfuckInstruction {
 
 	private $symbol;
 
