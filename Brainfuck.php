@@ -12,7 +12,7 @@ if (!defined("MEDIAWIKI")) {
 	die("This file is a MediaWiki extension, it is not a valid entry point.");
 }
 
-if ( !method_exists("ParserOutput", "addHeadItem") ) {
+if (!method_exists("ParserOutput", "addHeadItem")) {
   die("Sorry, but your MediaWiki version is too old for Brainfuck, please upgrade to the latest MediaWiki version.");
 }
 
@@ -24,7 +24,12 @@ $wgExtensionCredits["parserhook"][] = array(
 	"description" => "Brainfuck Embedded Interpreter"
 );
 
-$wgHooks["ParserFirstCallInit"][] = "efBrainfuckSetup";
+if (defined('MW_SUPPORTS_PARSERFIRSTCALLINIT')) {
+	$wgHooks["ParserFirstCallInit"][] = "efBrainfuckSetup";
+} else {
+	$wgExtensionFunctions[] = "efBrainfuckSetup";
+}
+
 $wgHooks["LanguageGetMagic"][] = "efBrainfuckMagic";
 
 function efBrainfuckSetup(&$parser) {
